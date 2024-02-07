@@ -54,7 +54,8 @@ func process[T any](ctx context.Context, in, out chan T, ch *UnboundedChan[T]) {
 	drain := func() {
 		for !ch.buffer.IsEmpty() {
 			select {
-			case out <- ch.buffer.Pop():
+			case out <- ch.buffer.Peek():
+				ch.buffer.Pop()
 				atomic.AddInt64(&ch.bufCount, -1)
 			case <-ctx.Done():
 				return
